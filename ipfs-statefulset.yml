@@ -1,0 +1,64 @@
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  name: ipfs
+  namespace: ipfs
+spec:
+  serviceName: ipfs
+  replicas: 4
+  template:
+    metadata:
+      labels:
+        app: ipfs
+    spec:
+      initContainers:
+      - name: init-repo
+        image: ipfs/go-ipfs:v0.4.13
+        env:
+        - name: NODE_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: spec.nodeName
+        command: ['/bin/sh', '/etc/ipfs-config/init.sh']
+        volumeMounts:
+        - name: data
+          mountPath: /data/ipfs
+        - name: secrets
+          mountPath: /etc/ipfs-secrets
+        - name: config
+          mountPath: /etc/ipfs-config
+      containers:
+      - name: ipfs
+        image: ipfs/go-ipfs:v0.4.13
+        env:
+        - name: IPFS_LOGGING
+          value: debug
+        command:
+        - ipfs
+        - daemon
+        ports:
+        - containerPort: 4001
+          name: swarm
+        - containerPort: 5001
+          name: api
+        - containerPort: 8080
+          name: readonly
+        volumeMounts:
+        - name: data
+          mountPath: /data/ipfs
+      volumes:
+      - name: secrets
+        secret:
+          secretName: swarm-key
+      - name: config
+        configMap:
+          name: ipfs-config
+  volumeClaimTemplates:
+  - metadata:
+      name: data
+      namespace: ipfs
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 100Mi
