@@ -28,7 +28,7 @@ data:
       echo "No swarm.key found, copying from mounted secret"
       [ -f /etc/ipfs-secrets/swarm.key ] || {
         echo "No swarm.key found in ipfs secret, please see"
-        echo "https://github.com/ipfs/go-ipfs/blob/v0.4.11/docs/experimental-features.md#private-networks"
+        echo "https://github.com/ipfs/go-ipfs/blob/v0.4.13/docs/experimental-features.md#private-networks"
         echo "Then upload secret using something like:"
         echo "kubectl -n ipfs create secret generic ipfs --from-file=./swarm.key"
         exit 1

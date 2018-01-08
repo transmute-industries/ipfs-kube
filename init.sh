@@ -2,30 +2,30 @@
 
 set -ex
 
-echo "Creating private swarm key"
 go get github.com/Kubuxu/go-ipfs-swarm-key-gen/ipfs-swarm-key-gen
 ipfs-swarm-key-gen > swarm.key
+echo "./swarm.key created"
 
-echo "Create ipfs namespace"
 kubectl apply -f ./ipfs-namespace.yml
+echo "namespace \"ipfs\" configured"
 
-echo "Store private swarm key as secret in ipfs namespace"
 kubectl -n ipfs create secret generic swarm-key --from-file=./swarm.key
+echo "swarm-key secret created"
 
-echo "Create configmap ipfs-config"
 kubectl apply -f ./ipfs-config.yml
+echo "configmap \"ipfs-config\" created"
 
-echo "Create ipfs service"
 kubectl apply -f ./ipfs-service.yml
+echo "service \"ipfs\" created"
 
-echo "Create swarm service"
 kubectl apply -f ./swarm-service.yml
+echo "service \"swarm\" created"
 
-echo "Create api service"
 kubectl apply -f ./api-service.yml
+echo "service \"api\" created"
 
-echo "Create readonly service"
 kubectl apply -f ./readonly-service.yml
+echo "service \"readonly\" created"
 
-echo "Create ipfs statefulset"
-kubectl apply -f ./ipfs-statefulset.yml
+kubectl apply -f ./ipfs.yml
+echo "statefulset \"ipfs\" created"
